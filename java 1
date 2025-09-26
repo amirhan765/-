@@ -1,0 +1,5 @@
+const stroka = "AaBbCcDd"
+const a = stroka.slice(0,-1, 2)
+const b = stroka.slice(1,-1, 2)
+document.write(a)
+document.write(b)
