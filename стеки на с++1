@@ -1,0 +1,29 @@
+#include <iostream>
+#include <stack>
+using namespace std;
+
+int main() {
+	int n;
+	cin >> n; //вводим количество элементов в массиве
+	int a[n];
+	for (int i = 0; i < n; i++){
+	    cin >> a[i]; //вводим масив
+	}
+	int result[n]; //здесь храним ответ для каждого элемента
+	for (int i = 0; i < n; i++){
+	    result[i] = -1;
+	}
+	stack<int> st;//стек индексов элементов
+	for (int i = n - 1; i >= 0; i--){
+	    while (!st.empty() && a[i] < a[st.top()]){
+	        result[st.top()] = i; //обновляем ответ для вершины стека
+	        st.pop();//удаляем вершину
+	    }
+	    st.push(i); //добавялем i в стек
+	}
+	for (int i = 0; i < n; i++){
+	    cout << result[i] << ' ';
+	} //выводим ответ
+    
+    return 0;
+}
