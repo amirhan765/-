@@ -1,0 +1,32 @@
+#include <iostream>
+#include <map>
+#include <string>
+ 
+using namespace std;
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int t; cin >> t;
+    while(t--) {
+        map<int, int> heap;
+        int n; cin >> n;
+        for (int i = 0; i < n; ++i) {
+            string op;
+            cin >> op;
+            if (op == "Insert") {
+                int x;
+                cin >> x;
+                heap[x]++;
+            } else if (op == "GetMin") {
+                cout << heap.begin()->first << '\n';
+            } else if (op == "EraseMin") {
+                heap.begin()->second--;
+                if (heap.begin()->second == 0) {
+                    heap.erase(heap.begin());
+                }
+            }
+        }
+    }
+    return 0;
+}
