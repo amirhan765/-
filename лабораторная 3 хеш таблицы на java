@@ -1,0 +1,25 @@
+void removeUnprofitableOrders() {
+        ArrayList<String> names = new ArrayList<>(); // Список клиентов с заказами меньше 5000
+ 
+        // Наполним список names
+        for (String name : customersOrders.keySet()) {
+            ArrayList<Double> orders = customersOrders.get(name);
+            double ordersSum = 0;
+            for (Double order : orders) {
+                ordersSum += order;
+            }
+            if (ordersSum < 5000) {
+                names.add(name);  
+            }
+        }
+ 
+        // Удаляем клиентов из HashMap после завершения обхода (цикла)
+        for (String name : names) {
+            customersOrders.remove(name); // здесь было names.remove(names)
+            // т.е. Вы изменяли список names во время итерации внутри цикла
+            // удаление customerOrders выполняется уже после окончания обхода.
+            System.out.println("Клиента " + name + " больше нет в таблице.");
+        }
+    }
+ 
+}
