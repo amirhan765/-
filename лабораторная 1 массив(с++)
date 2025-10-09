@@ -1,0 +1,76 @@
+int main()
+{
+	int* a;
+	int n;
+ 
+	// ввод n с проверкой
+	do
+	{
+		cout<<"input n: ";
+		cin>>n;
+	}
+	while (n<1);
+ 
+	// выделение памяти
+	a=new int [n];
+ 
+	// ввод с консоли значений массива
+	for (int i=0; i<n; i++)
+	{
+		cout<<"input a["<<i<<"]: ";
+		cin>>a[i];
+	}
+ 
+	//вывод исходного массива на экран
+	cout<<"start: "<<endl;
+	for (int i=0; i<n; i++)
+		cout<<a[i]<<" ";
+	cout<<endl;
+ 
+	// поиск наибольшего нечетного
+	int imax=-1;
+	for (int i=0; i<n; i++)
+		if (a[i]%2==1)
+		{
+			if (imax==-1)
+				imax=i;
+			else
+				if (a[imax]<a[i])
+					imax=i;
+		}
+ 
+	if (imax==-1) // если нечетных нет вообще
+		cout<<"no odd number"<<endl;
+	else
+	{   // вывод на консоль наибольшего нечетного
+		cout<<"max odd number: "<<a[imax]<<endl;
+		cout<<"index         : "<<imax<<endl;
+ 
+		if (imax!=n-1) // если справа от него есть элементы
+		for (int i=0; i<3; i++) // сдвиг три раза
+		{
+			int t=a[imax+1];
+			for (int j=imax+1; j<n-1; j++) // сдвиг
+				a[j]=a[j+1];
+			a[n-1]=t;
+		}
+ 
+		if (imax!=0) // если слева от него есть элементы
+		{
+			int t=a[imax-1]; 
+			for (int j=imax-1; j>0; j--) // сдвиг
+				a[j]=a[j-1];
+			a[0]=t;
+		}
+ 
+		// вывод на консоль результат
+		cout<<"end: "<<endl;
+		for (int i=0; i<n; i++)
+			cout<<a[i]<<" ";
+		cout<<endl;
+	}
+	// удаление памяти
+	delete [] a;
+	getch();
+	return 0;
+}
