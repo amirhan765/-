@@ -1,0 +1,42 @@
+import java.math.BigInteger;
+
+public class Fib {
+    public BigInteger next_ = BigInteger.ONE;
+    public BigInteger current_ = BigInteger.ZERO;
+    public int n = 0;
+
+    public Fib next() {
+        BigInteger tmp = next_.add(current_);
+        current_ = next_;
+        next_ = tmp;
+        n++;
+        return this;
+    }
+
+    public static Fib slow(int n) {
+        var result = new Fib();
+        for (var i = 0; i < n; i++) {
+            result.next();
+        }
+        return result;
+    }
+
+    public static Fib fast(int n) {
+        if (n < 16) {
+            return Fib.slow(n);
+        } 
+
+        var result = Fib.fast(n/2);
+        result.n *= 2;
+        // F_{2n+1} = F_{n+1}**2 + F_{n}**2
+        var _next = result.next_.multiply(result.next_).add(result.current_.multiply(result.current_));
+        // F_{2n} = (2*F_{n+1} - F_{n})*F_{n}
+        var _current = (result.next_.add(result.next_).subtract(result.current_)).multiply(result.current_);
+        result.next_ = _next;
+        result.current_ = _current;
+        if (n%2 == 1) {
+            result.next();
+        }
+        return result;
+    }
+}
