@@ -1,0 +1,11 @@
+public boolean next(final int pos) {
+        if ( m_Array_Index_1[pos] == m_maxIndex ) {
+            if ( pos == 0 ) {
+                return false;
+            }
+            m_Array_Index_1[pos] = 0;
+            return next(pos - 1);
+        }
+        m_Array_Index_1[pos]++;
+        return true;
+    }
