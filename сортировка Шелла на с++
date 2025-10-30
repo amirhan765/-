@@ -1,0 +1,43 @@
+#include <iostream>
+#include <vector>
+
+// Функция для сортировки Шелла
+void shellSort(std::vector<int>& arr) {
+    int n = arr.size();
+
+    for (int gap = n/2; gap > 0; gap /= 2) {
+        // Проходим по всему массиву с текущим промежутком
+        for (int i = gap; i < n; i++) {
+            int temp = arr[i];
+            int j;
+            // Сдвигаем элементы, которые больше temp, вправо
+            for (j = i; j >= gap && arr[j - gap] > temp; j -= gap) {
+                arr[j] = arr[j - gap];
+            }
+            // Вставляем temp на правильное место
+            arr[j] = temp;
+        }
+    }
+}
+
+// Метод для вывода массива
+void printArray(const std::vector<int>& arr) {
+    for (int num : arr) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    std::vector<int> arr = {12, 34, 54, 2, 3};
+
+    std::cout << "Исходный массив: ";
+    printArray(arr);
+
+    shellSort(arr);
+
+    std::cout << "Отсортированный массив: ";
+    printArray(arr);
+
+    return 0;
+}
