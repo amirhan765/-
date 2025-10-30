@@ -1,0 +1,54 @@
+#include <iostream>
+#include <vector>
+
+// Функция для "heapify" поддерева с корнем в i, размером n
+void heapify(std::vector<int>& arr, int n, int i) {
+    int largest = i; // Инициализируем наибольший элемент как корень
+    int left = 2 * i + 1; // левый = 2*i + 1
+    int right = 2 * i + 2; // правый = 2*i + 2
+
+    // Проверьте, существует ли левый дочерний и он больше текущего
+    if (left < n && arr[left] > arr[largest])
+        largest = left;
+    // Проверьте, существует ли правый дочерний и он больше текущего
+    if (right < n && arr[right] > arr[largest])
+        largest = right;
+    // Если наибольший не корень
+    if (largest != i) {
+        std::swap(arr[i], arr[largest]);
+        // рекурсивно heapify поддерево
+        heapify(arr, n, largest);
+    }
+}
+
+// Основная функция heap sort
+void heapSort(std::vector<int>& arr) {
+    int n = arr();
+
+    // Построение max-heap
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    // Один за другим извлекаем элементы из heap
+    for (int i = n - 1; i > 0; i--) {
+        std::swap(arr[0], arr[i]);
+        heapify(arr, i, 0);
+    }
+}
+
+int main() {
+    std::vector<int> arr = {12, 11, 13, 5, 6, 7};
+    std::cout << "Исходный массив: ";
+    for (int v : arr)
+        std::cout << v << " ";
+    std::cout << std::endl;
+
+    heapSort(arr);
+
+    std::cout << "Отсортированный массив: ";
+    for (int v : arr)
+        std::cout << v << " ";
+    std::cout << std::endl;
+
+    return 0;
+}
