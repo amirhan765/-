@@ -1,0 +1,35 @@
+#include <iostream>
+#include <vector>
+
+int interpolationSearch(const std::vector<int>& arr, int lo, int hi, int x) {
+    if (lo <= hi && x >= arr[lo] && x <= arr[hi]) {
+        // Рассчитываем предполагаемую позицию
+        int pos = lo + ((hi - lo) * (x - arr[lo])) / (arr[hi] - arr[lo]);
+
+        // Проверка, найден ли элемент
+        if (arr[pos] == x)
+            return pos;
+
+        // Если x больше, ищем в правой части
+        if (arr[pos] < x)
+            return interpolationSearch(arr, pos + 1, hi, x);
+
+        // Если x меньше, ищем в левой части
+        if (arr[pos] > x)
+            return interpolationSearch(arr, lo, pos - 1, x);
+    }
+    return -1; // Если элемент не найден
+}
+
+int main() {
+    std::vector<int> array = {10, 20, 30, 40, 50};
+    int target = 30;
+    int index = interpolationSearch(array, 0, array.size() - 1, target);
+
+    if (index != -1)
+        std::cout << "Элемент найден по индексу: " << index << std::endl;
+    else
+        std::cout << "Элемент не найден" << std::endl;
+
+    return 0;
+}
