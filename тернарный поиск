@@ -1,0 +1,42 @@
+#include <iostream>
+using namespace std;
+
+// Триарный поиск в массиве
+int ternarySearch(int arr[], int left, int right, int x) {
+    if (left > right)
+        return -1; // не найден
+
+    // Делим диапазон на три части
+    int third = (right - left) / 3;
+
+    int mid1 = left + third;
+    int mid2 = right - third;
+
+    if (arr[mid1] == x)
+        return mid1;
+    if (arr[mid2] == x)
+        return mid2;
+
+    // Область поиска дальше
+    if (x < arr[mid1])
+        return ternarySearch(arr, left, mid1 - 1, x);
+    else if (x > arr[mid2])
+        return ternarySearch(arr, mid2 + 1, right, x);
+    else
+        return ternarySearch(arr, mid1 + 1, mid2 - 1, x);
+}
+
+int main() {
+    int arr[] = {1, 3, 5, 7, 9, 11};
+    int n = sizeof(arr) / sizeof(arr[0]);
+    int x = 7; // искомый элемент
+
+    int index = ternarySearch(arr, 0, n - 1, x);
+
+    if (index != -1)
+        cout << "Элемент " << x << " найден по индексу " << index << endl;
+    else
+        cout << "Элемент " << x << " не найден" << endl;
+
+    return 0;
+}
