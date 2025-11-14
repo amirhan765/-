@@ -1,0 +1,39 @@
+def bucket_sort(arr):
+    # Если массив пустой, просто возвращаем его
+    if len(arr) == 0:
+        return arr
+
+    # Шаг 1: Определяем число корзин
+    bucket_count = 10  # Количество корзин (можно изменить по необходимости)
+
+    # Шаг 2: Находим минимальное и максимальное значение
+    min_value = min(arr)
+    max_value = max(arr)
+
+    # Шаг 3: Вычисляем размер корзины
+    bucket_size = (max_value - min_value) / bucket_count
+
+    # Шаг 4: Создаем пустые корзины
+    buckets = [[] for _ in range(bucket_count)]
+
+    # Шаг 5: Распределяем элементы по корзинам
+    for num in arr:
+        # Определяем индекс корзины для текущего элемента
+        index = int((num - min_value) / bucket_size)
+        # Обработка границы, чтобы индекс не вышел за пределы
+        if index == bucket_count:
+            index -= 1
+        buckets[index].append(num)
+
+    # Шаг 6: Сортируем каждую корзину и объединяем результат
+    sorted_array = []
+    for bucket in buckets:
+        # Внутри корзины можно использовать любой сортировщик
+        sorted_bucket = sorted(bucket)
+        sorted_array.extend(sorted_bucket)
+
+    return sorted_array
+
+# Пример использования
+array = [0.42, 2.23, 3.07, 4.5, 1.2, 2.8, 3.4]
+print(bucket_sort(array)
