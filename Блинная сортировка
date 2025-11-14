@@ -1,35 +1,41 @@
-def binning_sort(arr):
-    if len(arr) == 0:
-        return arr
+#include <iostream>
+using namespace std;
 
-    # Находим минимальное и максимальное значение
-    min_value = min(arr)
-    max_value = max(arr)
+void bubbleSort(int arr[], int n) {
+    bool swapped;
+    // Внешний цикл — повторяем прохождения, пока не пройдет без обменов
+    for (int i = 0; i < n - 1; i++) {
+        swapped = false;
+        // Внутренний цикл — сравниваем и меняем местами соседние элементы
+        for (int j = 0; j < n - i - 1; j++) {
+            // Если текущий элемент больше следующего, меняем местами
+            if (arr[j] > arr[j + 1]) {
+                swap(arr[j], arr[j + 1]);
+                swapped = true; // Был хотя бы один обмен
+            }
+        }
+        // Если за проход не было обменов, массив уже отсортирован
+        if (!swapped)
+            break;
+    }
+}
 
-    # Определяем количество "блинов" (карманов)
-    # Можно выбрать, например, по количеству элементов или по диапазону
-    # Тут возьмем количество блинов равное длине массива
-    num_bins = len(arr)
+int main() {
+    int arr[] = {64, 34, 25, 12, 22, 11, 90}; // Исходный массив
+    int n = sizeof(arr) / sizeof(arr[0]);
 
-    # Создаем список для "блинов" (карманов)
-    bins = [[] for _ in range(num_bins)]
+    cout << "Исходный массив:\n";
+    for (int i = 0; i < n; i++)
+        cout << arr[i] << " ";
+    cout << endl;
 
-    # Распределяем элементы по блинам
-    for num in arr:
-        # Находим индекс блинна для текущего числа
-        # Используем формулу:
-        # index = (num - min_value) * (num_bins - 1) // (max_value - min_value)
-        # чтобы распределить все по диапазону
-        index = (num - min_value) * (num_bins - 1) // (max_value - min_value)
-        bins[index].append(num)
+    // Вызов функции сортировки
+    bubbleSort(arr, n);
 
-    # Сортируем каждый блин и собираем итог
-    sorted_arr = []
-    for b in bins:
-        sorted_arr.extend(sorted(b))  # Внутри блинов можно использовать встроенную сортировку
+    cout << "Отсортированный массив:\n";
+    for (int i = 0; i < n; i++)
+        cout << arr[i] << " ";
+    cout << endl;
 
-    return sorted_arr
-
-# Пример использования:
-array = [3.2, 1.5, 4.8, 2.2, 3.9, 0.5]
-print(binning_sort(array))
+    return 0;
+} 
