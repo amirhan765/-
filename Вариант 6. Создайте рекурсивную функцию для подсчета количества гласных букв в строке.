@@ -1,0 +1,14 @@
+def count_russian_vowels(s):
+    if len(s) == 0:
+        return 0
+    
+    russian_vowels = "аеёиоуыэюя"
+    first_char = s[0].lower()
+    
+    if first_char in russian_vowels:
+        return 1 + count_russian_vowels(s[1:])
+    else:
+        return count_russian_vowels(s[1:])
+
+# Примеры
+print(count_russian_vowels("Привет"))  
