@@ -1,0 +1,10 @@
+def sum_of_digits(n):
+    n = abs(n)  # учитываем отрицательные числа
+    if n == 0:
+        return 0
+    else:
+        return n % 10 + sum_of_digits(n // 10)
+
+# Пример использования:
+число = 1234
+print(f"Сумма цифр числа {число} равна {sum_of_digits(число)}")
