@@ -1,0 +1,19 @@
+def combinations(n, k):
+    def backtrack(start, current_comb):
+        # Если текущее сочетание достигло размера k, добавляем его
+        if len(current_comb) == k:
+            result.append(current_comb.copy())
+            return
+        
+        # Перебираем элементы от start до n
+        for i in range(start, n):
+            current_comb.append(i)          # добавляем элемент
+            backtrack(i + 1, current_comb)  # рекурсивно вызываем для следующих
+            current_comb.pop()              # удаляем элемент (backtrack)
+    
+    result = []
+    backtrack(0, [])
+    return result
+
+# Примеры использования
+print(combinations(4, 2))
