@@ -1,0 +1,98 @@
+def solve_sudoku(board):
+    """
+    Решает судоку с помощью алгоритма backtracking
+    """
+    def is_valid(num, row, col):
+        # Проверяем строку
+        for i in range(9):
+            if board[row][i] == num:
+                return False
+        
+        # Проверяем столбец
+        for i in range(9):
+            if board[i][col] == num:
+                return False
+        
+        # Проверяем квадрат 3x3
+        start_row, start_col = 3 * (row // 3), 3 * (col // 3)
+        for i in range(3):
+            for j in range(3):
+                if board[start_row + i][start_col + j] == num:
+                    return False
+        
+        return True
+    
+    def find_empty():
+        # Находим следующую пустую клетку
+        for i in range(9):
+            for j in range(9):
+                if board[i][j] == 0:
+                    return i, j
+        return None
+    
+    def backtrack():
+        empty_cell = find_empty()
+        
+        # Если нет пустых клеток - судоку решено
+        if not empty_cell:
+            return True
+        
+        row, col = empty_cell
+        
+        # Пробуем числа от 1 до 9
+        for num in range(1, 10):
+            if is_valid(num, row, col):
+                board[row][col] = num
+                
+                # Рекурсивно пытаемся решить остальную часть
+                if backtrack():
+                    return True
+                
+                # Если не получилось - откатываемся
+                board[row][col] = 0
+        
+        # Если ни одно число не подошло
+        return False
+    
+    return backtrack()
+
+def print_board(board):
+    """Красиво выводит доску судоку"""
+    for i in range(9):
+        if i % 3 == 0 and i != 0:
+            print("-" * 21)
+        
+        for j in range(9):
+            if j % 3 == 0 and j != 0:
+                print("|", end=" ")
+            
+            if board[i][j] == 0:
+                print(".", end=" ")
+            else:
+                print(board[i][j], end=" ")
+        print()
+
+# Пример использования
+if __name__ == "__main__":
+    # Пример судоку (0 означает пустую клетку)
+    sudoku_board = [
+        [5, 3, 0, 0, 7, 0, 0, 0, 0],
+        [6, 0, 0, 1, 9, 5, 0, 0, 0],
+        [0, 9, 8, 0, 0, 0, 0, 6, 0],
+        [8, 0, 0, 0, 6, 0, 0, 0, 3],
+        [4, 0, 0, 8, 0, 3, 0, 0, 1],
+        [7, 0, 0, 0, 2, 0, 0, 0, 6],
+        [0, 6, 0, 0, 0, 0, 2, 8, 0],
+        [0, 0, 0, 4, 1, 9, 0, 0, 5],
+        [0, 0, 0, 0, 8, 0, 0, 7, 9]
+    ]
+    
+    print("Исходное судоку:")
+    print_board(sudoku_board)
+    print()
+    
+    if solve_sudoku(sudoku_board):
+        print("Решенное судоку:")
+        print_board(sudoku_board)
+    else:
+        print("Решение не найдено!")
