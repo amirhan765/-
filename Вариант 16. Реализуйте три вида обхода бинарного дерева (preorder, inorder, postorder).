@@ -1,0 +1,164 @@
+class TreeNode:
+    """Узел бинарного дерева"""
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def preorder_traversal(root):
+    """Прямой обход (Pre-order): Корень -> Левое поддерево -> Правое поддерево"""
+    result = []
+    
+    def traverse(node):
+        if node is None:
+            return
+        result.append(node.val)  # Посещаем корень
+        traverse(node.left)      # Обходим левое поддерево
+        traverse(node.right)     # Обходим правое поддерево
+    
+    traverse(root)
+    return result
+
+def inorder_traversal(root):
+    """Центральный обход (In-order): Левое поддерево -> Корень -> Правое поддерево"""
+    result = []
+    
+    def traverse(node):
+        if node is None:
+            return
+        traverse(node.left)      # Обходим левое поддерево
+        result.append(node.val)  # Посещаем корень
+        traverse(node.right)     # Обходим правое поддерево
+    
+    traverse(root)
+    return result
+
+def postorder_traversal(root):
+    """Обратный обход (Post-order): Левое поддерево -> Правое поддерево -> Корень"""
+    result = []
+    
+    def traverse(node):
+        if node is None:
+            return
+        traverse(node.left)      # Обходим левое поддерево
+        traverse(node.right)     # Обходим правое поддерево
+        result.append(node.val)  # Посещаем корень
+    
+    traverse(root)
+    return result
+
+def preorder_iterative(root):
+    """Прямой обход в итеративном стиле"""
+    if not root:
+        return []
+    
+    result = []
+    stack = [root]
+    
+    while stack:
+        node = stack.pop()
+        result.append(node.val)
+        
+        # Сначала добавляем правого потомка, потом левого
+        # чтобы левый обрабатывался первым (LIFO)
+        if node.right:
+            stack.append(node.right)
+        if node.left:
+            stack.append(node.left)
+    
+    return result
+
+def inorder_iterative(root):
+    """Центральный обход в итеративном стиле"""
+    result = []
+    stack = []
+    current = root
+    
+    while current or stack:
+        # Идем до самого левого узла
+        while current:
+            stack.append(current)
+            current = current.left
+        
+        # Поднимаемся по стеку
+        current = stack.pop()
+        result.append(current.val)
+        
+        # Переходим к правому поддереву
+        current = current.right
+    
+    return result
+
+def postorder_iterative(root):
+    """Обратный обход в итеративном стиле"""
+    if not root:
+        return []
+    
+    result = []
+    stack = [root]
+    
+    while stack:
+        node = stack.pop()
+        result.append(node.val)
+        
+        # Добавляем левого потомка, потом правого
+        if node.left:
+            stack.append(node.left)
+        if node.right:
+            stack.append(node.right)
+    
+    # Реверсируем результат, так как мы добавляли в порядке корень-правый-левый
+    return result[::-1]
+
+def create_example_tree():
+    """Создает пример бинарного дерева:
+          1
+        /   \
+       2     3
+      / \   /
+     4   5 6
+    """
+    root = TreeNode(1)
+    root.left = TreeNode(2)
+    root.right = TreeNode(3)
+    root.left.left = TreeNode(4)
+    root.left.right = TreeNode(5)
+    root.right.left = TreeNode(6)
+    return root
+
+def print_traversal_results(root):
+    """Выводит результаты всех обходов"""
+    print("Бинарное дерево:")
+    print("    1")
+    print("   / \\")
+    print("  2   3")
+    print(" / \\ /")
+    print("4  5 6")
+    print()
+    
+    print("Рекурсивные обходы:")
+    print(f"Pre-order (прямой):  {preorder_traversal(root)}")
+    print(f"In-order (центральный): {inorder_traversal(root)}")
+    print(f"Post-order (обратный):  {postorder_traversal(root)}")
+    print()
+    
+    print("Итеративные обходы:")
+    print(f"Pre-order (прямой):  {preorder_iterative(root)}")
+    print(f"In-order (центральный): {inorder_iterative(root)}")
+    print(f"Post-order (обратный):  {postorder_iterative(root)}")
+
+# Демонстрация
+if __name__ == "__main__":
+    tree = create_example_tree()
+    print_traversal_results(tree)
+    
+    # Дополнительный пример с объяснением
+    print("\nОбъяснение обходов для дерева [1,2,3,4,5,6]:")
+    print("Pre-order:  Корень -> Лево -> Право")
+    print("            [1, 2, 4, 5, 3, 6]")
+    print()
+    print("In-order:   Лево -> Корень -> Право") 
+    print("            [4, 2, 5, 1, 6, 3]")
+    print()
+    print("Post-order: Лево -> Право -> Корень")
+    print("            [4, 5, 2, 6, 3, 1]")
