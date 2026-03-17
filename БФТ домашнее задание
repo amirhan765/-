@@ -1,0 +1,139 @@
+#include <iostream>
+#include <string>
+#include <windows.h>
+    using namespace std;
+
+class Event {
+private:
+    string eventName;
+    string eventDate;
+    int guestsCount;
+    double budget;
+
+public:
+    Event() {
+        eventName = "Не указано";
+        eventDate = "01.01.2026";
+        guestsCount = 0;
+        budget = 0;
+        cout << "Конструктор по умолчанию вызван" << endl;
+    }
+
+    Event(string name, string date, int guests, double b) {
+        eventName = name;
+        eventDate = date;
+        if (guests >= 0) guestsCount = guests;
+        else {
+            guestsCount = 0;
+            cout << "Количество гостей не может быть отрицательным. Установлено 0." << endl;
+        }
+        if (b >= 0) budget = b;
+        else {
+            budget = 0;
+            cout << "Бюджет не может быть отрицательным. Установлен 0." << endl;
+        }
+        cout << "Конструктор с параметрами вызван" << endl;
+    }
+
+    ~Event() {
+        cout << "Мероприятие \"" << eventName << "\" удалено" << endl;
+    }
+
+    void setGuestsCount(int guests) {
+        if (guests >= 0) guestsCount = guests;
+        else cout << "Ошибка: количество гостей не может быть отрицательным" << endl;
+    }
+
+    void setBudget(double b) {
+        if (b >= 0) budget = b;
+        else cout << "Ошибка: бюджет не может быть отрицательным" << endl;
+    }
+
+    string getEventName() {
+        return eventName;
+    }
+
+    double getBudget() {
+        return budget;
+    }
+
+    int getGuestsCount() {
+        return guestsCount;
+    }
+
+    void addGuests(int additionalGuests) {
+        if (additionalGuests > 0) {
+            guestsCount += additionalGuests;
+            cout << "Добавлено гостей: " << additionalGuests << ". Теперь гостей: " << guestsCount << endl;
+        }
+        else {
+            cout << "Ошибка: количество добавляемых гостей должно быть положительным" << endl;
+        }
+    }
+
+    double calculateCostPerGuest() {
+        if (guestsCount > 0) {
+            return budget / guestsCount;
+        }
+        else {
+            cout << "Ошибка: количество гостей равно 0" << endl;
+            return 0;
+        }
+    }
+
+    void printInfo() {
+        cout << "========== ИНФОРМАЦИЯ О МЕРОПРИЯТИИ ==========" << endl;
+        cout << "Название: " << eventName << endl;
+        cout << "Дата: " << eventDate << endl;
+        cout << "Количество гостей: " << guestsCount << endl;
+        cout << "Бюджет: " << budget << " руб." << endl;
+        cout << "===============================================" << endl;
+    }
+};
+
+int main() {
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    cout << "--- РАБОТА ПРОГРАММЫ ---" << endl << endl;
+
+    cout << "1. СОЗДАНИЕ ОБЪЕКТА ЧЕРЕЗ КОНСТРУКТОР ПО УМОЛЧАНИЮ:" << endl;
+    Event event1;
+    event1.printInfo();
+    cout << endl;
+
+    cout << "2. СОЗДАНИЕ ОБЪЕКТА ЧЕРЕЗ КОНСТРУКТОР С ПАРАМЕТРАМИ:" << endl;
+    Event event2("Свадьба", "15.06.2026", 50, 150000);
+    event2.printInfo();
+    cout << endl;
+
+    cout << "3. ДЕМОНСТРАЦИЯ СЕТТЕРОВ (ДЛЯ event1):" << endl;
+    event1.setGuestsCount(30);
+    event1.setBudget(75000);
+    cout << "Новые значения: гостей = " << event1.getGuestsCount() << ", бюджет = " << event1.getBudget() << endl;
+
+    cout << "Попытка установить некорректные значения:" << endl;
+    event1.setGuestsCount(-10);
+    event1.setBudget(-5000);
+    cout << endl;
+
+    cout << "4. ДЕМОНСТРАЦИЯ МЕТОДА addGuests (ДЛЯ event2):" << endl;
+    cout << "Текущее количество гостей: " << event2.getGuestsCount() << endl;
+    event2.addGuests(10);
+    event2.addGuests(-5);
+    cout << endl;
+
+    cout << "5. ДЕМОНСТРАЦИЯ МЕТОДА calculateCostPerGuest (ДЛЯ event2):" << endl;
+    cout << "Бюджет: " << event2.getBudget() << " руб." << endl;
+    cout << "Гостей: " << event2.getGuestsCount() << endl;
+    cout << "Стоимость на одного гостя: " << event2.calculateCostPerGuest() << " руб." << endl;
+    cout << endl;
+
+    cout << "6. СОЗДАНИЕ ОБЪЕКТА С НЕКОРРЕКТНЫМИ ДАННЫМИ:" << endl;
+    Event event3("День рождения", "20.07.2026", -20, -30000);
+    event3.printInfo();
+    cout << endl;
+
+    cout << "--- ЗАВЕРШЕНИЕ РАБОТЫ ---" << endl;
+    return 0;
+}
