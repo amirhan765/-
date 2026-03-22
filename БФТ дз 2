@@ -1,0 +1,216 @@
+#include <iostream>
+#include <string>
+#include <windows.h>
+
+using namespace std;
+
+// ============================================================
+// Базовый абстрактный класс: Мероприятие
+// ============================================================
+class Event {
+protected:
+    string eventName;       // название мероприятия
+    string eventDate;       // дата проведения
+    int guestsCount;        // количество гостей
+    double budget;          // бюджет мероприятия
+
+public:
+    // Конструктор с параметрами
+    Event(string name, string date, int guests, double b) {
+        eventName = name;
+        eventDate = date;
+        if (guests >= 0) guestsCount = guests;
+        else {
+            guestsCount = 0;
+            cout << "Количество гостей не может быть отрицательным. Установлено 0." << endl;
+        }
+        if (b >= 0) budget = b;
+        else {
+            budget = 0;
+            cout << "Бюджет не может быть отрицательным. Установлен 0." << endl;
+        }
+        cout << "Конструктор Event вызван" << endl;
+    }
+
+    // Виртуальный деструктор
+    virtual ~Event() {
+        cout << "Мероприятие \"" << eventName << "\" удалено" << endl;
+    }
+
+    // Обычный метод (общий для всех потомков, не переопределяется)
+    void addGuests(int additionalGuests) {
+        if (additionalGuests > 0) {
+            guestsCount += additionalGuests;
+            cout << "Добавлено гостей: " << additionalGuests << ". Теперь гостей: " << guestsCount << endl;
+        }
+        else {
+            cout << "Ошибка: количество добавляемых гостей должно быть положительным" << endl;
+        }
+    }
+
+    // Геттеры
+    string getEventName() { return eventName; }
+    string getEventDate() { return eventDate; }
+    int getGuestsCount() { return guestsCount; }
+    double getBudget() { return budget; }
+
+    // Чисто виртуальные функции
+    virtual double calcTotalBudget() = 0;           // расчёт итогового бюджета
+    virtual string getEventPlan() = 0;              // формирование краткого плана мероприятия
+
+    // Виртуальный метод вывода информации (может быть переопределён)
+    virtual void printInfo() {
+        cout << "========== ИНФОРМАЦИЯ О МЕРОПРИЯТИИ ==========" << endl;
+        cout << "Название: " << eventName << endl;
+        cout << "Дата: " << eventDate << endl;
+        cout << "Количество гостей: " << guestsCount << endl;
+        cout << "Бюджет: " << budget << " руб." << endl;
+    }
+};
+
+// ============================================================
+// Производный класс: Свадьба
+// ============================================================
+class Wedding : public Event {
+private:
+    string ceremonyType;    // тип церемонии (выездная/классическая)
+    bool hasToastmaster;    // наличие тамады
+
+public:
+    Wedding(string name, string date, int guests, double b,
+            string type, bool toastmaster)
+        : Event(name, date, guests, b) {
+        ceremonyType = type;
+        hasToastmaster = toastmaster;
+    }
+
+    // Переопределение чисто виртуальных методов
+    double calcTotalBudget() override {
+        double additionalCost = 0;
+        if (hasToastmaster) {
+            additionalCost += 30000;   // стоимость тамады
+        }
+        if (ceremonyType == "выездная") {
+            additionalCost += 50000;   // дополнительные расходы на выездную церемонию
+        }
+        return budget + additionalCost;
+    }
+
+    string getEventPlan() override {
+        string plan = "Свадебное мероприятие. Церемония: " + ceremonyType;
+        if (hasToastmaster) {
+            plan += ", с тамадой";
+        }
+        plan += ". План: регистрация, банкет, развлекательная программа.";
+        return plan;
+    }
+
+    // Переопределение printInfo с вызовом базового метода
+    void printInfo() override {
+        Event::printInfo();
+        cout << "Тип церемонии: " << ceremonyType << endl;
+        cout << "Наличие тамады: " << (hasToastmaster ? "Да" : "Нет") << endl;
+        cout << "Итоговый бюджет (с учётом доп. расходов): " << calcTotalBudget() << " руб." << endl;
+        cout << "===============================================" << endl;
+    }
+};
+
+// ============================================================
+// Производный класс: Корпоративное мероприятие
+// ============================================================
+class CorporateEvent : public Event {
+private:
+    string companyName;     // название компании-заказчика
+    string format;          // формат (банкет/фуршет/конференция)
+
+public:
+    CorporateEvent(string name, string date, int guests, double b,
+                   string company, string fmt)
+        : Event(name, date, guests, b) {
+        companyName = company;
+        format = fmt;
+    }
+
+    // Переопределение чисто виртуальных методов
+    double calcTotalBudget() override {
+        double corporateDiscount = 0;
+        // Корпоративная скидка в зависимости от формата
+        if (format == "банкет") {
+            corporateDiscount = budget * 0.1;   // скидка 10%
+        }
+        else if (format == "фуршет") {
+            corporateDiscount = budget * 0.05;  // скидка 5%
+        }
+        else if (format == "конференция") {
+            corporateDiscount = budget * 0.15;  // скидка 15%
+        }
+        return budget - corporateDiscount;
+    }
+
+    string getEventPlan() override {
+        return "Корпоративное мероприятие для компании " + companyName +
+               ". Формат: " + format + ". План: приветствие, основная часть, фуршет/банкет.";
+    }
+
+    // Переопределение printInfo с вызовом базового метода
+    void printInfo() override {
+        Event::printInfo();
+        cout << "Компания-заказчик: " << companyName << endl;
+        cout << "Формат: " << format << endl;
+        cout << "Итоговый бюджет (с корпоративной скидкой): " << calcTotalBudget() << " руб." << endl;
+        cout << "===============================================" << endl;
+    }
+};
+
+// ============================================================
+// Главная функция: демонстрация полиморфизма
+// ============================================================
+int main() {
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    const int N = 4;
+    Event* events[N];
+
+    // Создаём объекты разных производных классов
+    events[0] = new Wedding("Свадьба Ивановых", "15.06.2026", 80, 200000,
+                            "выездная", true);
+    events[1] = new CorporateEvent("Корпоратив ООО 'Ромашка'", "20.07.2026", 120, 350000,
+                                   "ООО 'Ромашка'", "банкет");
+    events[2] = new Wedding("Свадьба Петровых", "10.08.2026", 50, 150000,
+                            "классическая", false);
+    events[3] = new CorporateEvent("Конференция 'IT-2026'", "05.09.2026", 200, 500000,
+                                   "ООО 'ТехноИнновации'", "конференция");
+
+    cout << "========== ДЕМОНСТРАЦИЯ ПОЛИМОРФИЗМА ==========" << endl;
+
+    // Цикл для вывода информации о каждом мероприятии (полиморфный вызов printInfo)
+    cout << "\n--- ИНФОРМАЦИЯ О ВСЕХ МЕРОПРИЯТИЯХ ---\n" << endl;
+    for (int i = 0; i < N; i++) {
+        events[i]->printInfo();
+        cout << endl;
+    }
+
+    // Демонстрация другого виртуального метода (getEventPlan)
+    cout << "\n--- ПЛАНЫ МЕРОПРИЯТИЙ (разное поведение) ---\n" << endl;
+    for (int i = 0; i < N; i++) {
+        cout << "Мероприятие: " << events[i]->getEventName() << endl;
+        cout << "План: " << events[i]->getEventPlan() << endl;
+        cout << "----------------------------------------" << endl;
+    }
+
+    // Демонстрация метода addGuests (обычный метод базового класса)
+    cout << "\n--- ДОБАВЛЕНИЕ ГОСТЕЙ ---\n" << endl;
+    events[0]->addGuests(10);
+    events[1]->addGuests(-5);   // некорректное значение
+    events[2]->addGuests(15);
+    events[3]->addGuests(20);
+
+    // Освобождение памяти
+    cout << "\n--- ОСВОБОЖДЕНИЕ ПАМЯТИ ---\n" << endl;
+    for (int i = 0; i < N; i++) {
+        delete events[i];
+    }
+
+    return 0;
+}
