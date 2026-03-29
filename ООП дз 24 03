@@ -1,0 +1,399 @@
+#include <iostream>
+#include <string>
+#include <limits>
+#include <windows.h>
+using namespace std;
+
+// ============================================================
+// Вспомогательные функции безопасного ввода
+// ============================================================
+
+int safeReadInt() {
+    int value;
+    while (true) {
+        cin >> value;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Ошибка ввода. Введите целое число: ";
+        }
+        else {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return value;
+        }
+    }
+}
+
+double safeReadDouble() {
+    double value;
+    while (true) {
+        cin >> value;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Ошибка ввода. Введите число: ";
+        }
+        else {
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return value;
+        }
+    }
+}
+
+string safeReadLine() {
+    string line;
+    getline(cin, line);
+    while (line.empty()) {
+        cout << "Строка не может быть пустой. Повторите ввод: ";
+        getline(cin, line);
+    }
+    return line;
+}
+
+// ============================================================
+// Базовый абстрактный класс: Мероприятие
+// ============================================================
+
+class Event {
+protected:
+    string name;
+    string date;
+    int guestCount;
+    double baseBudget;
+
+public:
+    Event(string n, string d, int guests, double budget) {
+        name = n;
+        date = d;
+        guestCount = (guests >= 0) ? guests : 0;
+        baseBudget = (budget >= 0) ? budget : 0;
+    }
+
+    virtual ~Event() {}
+
+    string getName() { return name; }
+    string getDate() { return date; }
+    int getGuestCount() { return guestCount; }
+    double getBaseBudget() { return baseBudget; }
+
+    void setGuestCount(int guests) {
+        if (guests >= 0) guestCount = guests;
+        else cout << "Ошибка: количество гостей не может быть отрицательным\n";
+    }
+
+    void addGuests(int additional) {
+        if (additional > 0) {
+            guestCount += additional;
+            cout << "Добавлено гостей: " << additional << ". Теперь: " << guestCount << endl;
+        }
+        else cout << "Ошибка: количество добавляемых гостей должно быть > 0\n";
+    }
+
+    // Полиморфный метод: расчет бюджета
+    virtual double calcTotalBudget() = 0;
+
+    // Полиморфный метод: план мероприятия
+    virtual string getEventPlan() = 0;
+
+    virtual void printInfo() {
+        cout << "==========================================\n";
+        cout << "Название:      " << name << endl;
+        cout << "Дата:          " << date << endl;
+        cout << "Кол-во гостей: " << guestCount << endl;
+        cout << "Базовый бюджет:" << baseBudget << " руб.\n";
+    }
+};
+
+// ============================================================
+// Производный класс: Свадьба
+// ============================================================
+
+class Wedding : public Event {
+private:
+    double costPerGuest;
+    double decorationCost;
+
+public:
+    Wedding(string n, string d, int guests, double budget, double costPerG, double decorCost)
+        : Event(n, d, guests, budget) {
+        costPerGuest = (costPerG >= 0) ? costPerG : 0;
+        decorationCost = (decorCost >= 0) ? decorCost : 0;
+    }
+
+    double calcTotalBudget() override {
+        return baseBudget + (guestCount * costPerGuest) + decorationCost;
+    }
+
+    string getEventPlan() override {
+        return "План свадьбы: церемония, банкет, конкурсы, торт, фотосессия.";
+    }
+
+    void printInfo() override {
+        Event::printInfo();
+        cout << "Тип:           Свадьба\n";
+        cout << "Стоимость/гость:" << costPerGuest << " руб.\n";
+        cout << "Декор:         " << decorationCost << " руб.\n";
+        cout << "Итоговый бюджет:" << calcTotalBudget() << " руб.\n";
+        cout << "План:          " << getEventPlan() << endl;
+        cout << "==========================================\n";
+    }
+};
+
+// ============================================================
+// Производный класс: Корпоратив
+// ============================================================
+
+class CorporateParty : public Event {
+private:
+    double entertainmentCost;
+    double cateringPerPerson;
+
+public:
+    CorporateParty(string n, string d, int guests, double budget, double entertainCost, double catering)
+        : Event(n, d, guests, budget) {
+        entertainmentCost = (entertainCost >= 0) ? entertainCost : 0;
+        cateringPerPerson = (catering >= 0) ? catering : 0;
+    }
+
+    double calcTotalBudget() override {
+        return baseBudget + entertainmentCost + (guestCount * cateringPerPerson);
+    }
+
+    string getEventPlan() override {
+        return "План корпоратива: приветствие, кейтеринг, выступление артистов, розыгрыши, фуршет.";
+    }
+
+    void printInfo() override {
+        Event::printInfo();
+        cout << "Тип:           Корпоратив\n";
+        cout << "Развлечения:   " << entertainmentCost << " руб.\n";
+        cout << "Кейтеринг/чел: " << cateringPerPerson << " руб.\n";
+        cout << "Итоговый бюджет:" << calcTotalBudget() << " руб.\n";
+        cout << "План:          " << getEventPlan() << endl;
+        cout << "==========================================\n";
+    }
+};
+
+// ============================================================
+// Функции работы с коллекцией мероприятий
+// ============================================================
+
+const int MAX_EVENTS = 100;
+
+void addEvent(Event* events[], int& count) {
+    if (count >= MAX_EVENTS) {
+        cout << "Достигнут максимум мероприятий.\n";
+        return;
+    }
+
+    cout << "\nТип мероприятия:\n";
+    cout << "1. Свадьба\n";
+    cout << "2. Корпоратив\n";
+    cout << "Выбор: ";
+    int type = safeReadInt();
+
+    cout << "Название: ";
+    string name = safeReadLine();
+    cout << "Дата (дд.мм.гггг): ";
+    string date = safeReadLine();
+    cout << "Количество гостей: ";
+    int guests = safeReadInt();
+    cout << "Базовый бюджет: ";
+    double budget = safeReadDouble();
+
+    if (type == 1) {
+        cout << "Стоимость на одного гостя: ";
+        double costPerGuest = safeReadDouble();
+        cout << "Стоимость декора: ";
+        double decor = safeReadDouble();
+        events[count] = new Wedding(name, date, guests, budget, costPerGuest, decor);
+        count++;
+        cout << "Свадьба добавлена.\n";
+    }
+    else if (type == 2) {
+        cout << "Бюджет на развлечения: ";
+        double entertain = safeReadDouble();
+        cout << "Кейтеринг на человека: ";
+        double catering = safeReadDouble();
+        events[count] = new CorporateParty(name, date, guests, budget, entertain, catering);
+        count++;
+        cout << "Корпоратив добавлен.\n";
+    }
+    else {
+        cout << "Неверный тип.\n";
+    }
+}
+
+void showAllEvents(Event* events[], int count) {
+    if (count == 0) {
+        cout << "Список мероприятий пуст.\n";
+        return;
+    }
+    for (int i = 0; i < count; i++) {
+        cout << "\n[" << i + 1 << "]\n";
+        events[i]->printInfo();
+    }
+}
+
+int selectEvent(int count) {
+    cout << "Номер мероприятия (1-" << count << "): ";
+    int idx = safeReadInt();
+    if (idx < 1 || idx > count) {
+        cout << "Неверный номер.\n";
+        return -1;
+    }
+    return idx - 1;
+}
+
+void showEventBudget(Event* events[], int count) {
+    if (count == 0) {
+        cout << "Нет мероприятий.\n";
+        return;
+    }
+    int idx = selectEvent(count);
+    if (idx < 0) return;
+    cout << "Итоговый бюджет: " << events[idx]->calcTotalBudget() << " руб.\n";
+}
+
+void showAllPlans(Event* events[], int count) {
+    if (count == 0) {
+        cout << "Нет мероприятий.\n";
+        return;
+    }
+    cout << "\n--- ПЛАНЫ ВСЕХ МЕРОПРИЯТИЙ ---\n";
+    for (int i = 0; i < count; i++) {
+        cout << events[i]->getName() << ": " << events[i]->getEventPlan() << endl;
+    }
+}
+
+void addGuestsToEvent(Event* events[], int count) {
+    if (count == 0) {
+        cout << "Нет мероприятий.\n";
+        return;
+    }
+    int idx = selectEvent(count);
+    if (idx < 0) return;
+    cout << "Сколько гостей добавить? ";
+    int additional = safeReadInt();
+    events[idx]->addGuests(additional);
+}
+
+void findEventByName(Event* events[], int count) {
+    if (count == 0) {
+        cout << "Нет мероприятий.\n";
+        return;
+    }
+    cout << "Введите название для поиска: ";
+    string search = safeReadLine();
+    bool found = false;
+    for (int i = 0; i < count; i++) {
+        if (events[i]->getName() == search) {
+            cout << "\nНайдено [" << i + 1 << "]\n";
+            events[i]->printInfo();
+            found = true;
+        }
+    }
+    if (!found) cout << "Мероприятие не найдено.\n";
+}
+
+void showStatistics(Event* events[], int count) {
+    if (count == 0) {
+        cout << "Нет мероприятий.\n";
+        return;
+    }
+
+    double totalBudget = 0;
+    int totalGuests = 0;
+    double maxBudget = events[0]->calcTotalBudget();
+    double minBudget = events[0]->calcTotalBudget();
+
+    for (int i = 0; i < count; i++) {
+        double b = events[i]->calcTotalBudget();
+        totalBudget += b;
+        totalGuests += events[i]->getGuestCount();
+        if (b > maxBudget) maxBudget = b;
+        if (b < minBudget) minBudget = b;
+    }
+
+    cout << "\n--- СТАТИСТИКА ---\n";
+    cout << "Всего мероприятий:   " << count << endl;
+    cout << "Суммарный бюджет:    " << totalBudget << " руб.\n";
+    cout << "Средний бюджет:      " << totalBudget / count << " руб.\n";
+    cout << "Максимальный бюджет: " << maxBudget << " руб.\n";
+    cout << "Минимальный бюджет:  " << minBudget << " руб.\n";
+    cout << "Общее количество гостей: " << totalGuests << endl;
+    cout << "Среднее кол-во гостей:   " << totalGuests / count << endl;
+}
+
+void removeEvent(Event* events[], int& count) {
+    if (count == 0) {
+        cout << "Нет мероприятий.\n";
+        return;
+    }
+    int idx = selectEvent(count);
+    if (idx < 0) return;
+
+    cout << "Удалено: " << events[idx]->getName() << endl;
+    delete events[idx];
+
+    for (int i = idx; i < count - 1; i++) {
+        events[i] = events[i + 1];
+    }
+    count--;
+}
+
+// ============================================================
+// Главная функция
+// ============================================================
+
+int main() {
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    Event* events[MAX_EVENTS];
+    int count = 0;
+    bool running = true;
+
+    while (running) {
+        cout << "\n======================================\n";
+        cout << "   ОРГАНИЗАЦИЯ ТОРЖЕСТВЕННЫХ МЕРОПРИЯТИЙ\n";
+        cout << "======================================\n";
+        cout << "1. Добавить мероприятие\n";
+        cout << "2. Показать все мероприятия\n";
+        cout << "3. Рассчитать бюджет мероприятия (полиморфизм)\n";
+        cout << "4. Показать планы всех мероприятий (полиморфизм в цикле)\n";
+        cout << "5. Добавить гостей\n";
+        cout << "6. Найти мероприятие по названию\n";
+        cout << "7. Статистика\n";
+        cout << "8. Удалить мероприятие\n";
+        cout << "0. Выход\n";
+        cout << "--------------------------------------\n";
+        cout << "Ваш выбор: ";
+
+        int choice = safeReadInt();
+
+        switch (choice) {
+        case 1: addEvent(events, count); break;
+        case 2: showAllEvents(events, count); break;
+        case 3: showEventBudget(events, count); break;
+        case 4: showAllPlans(events, count); break;
+        case 5: addGuestsToEvent(events, count); break;
+        case 6: findEventByName(events, count); break;
+        case 7: showStatistics(events, count); break;
+        case 8: removeEvent(events, count); break;
+        case 0:
+            running = false;
+            break;
+        default:
+            cout << "Неверный пункт меню.\n";
+        }
+    }
+
+    // Освобождение памяти
+    for (int i = 0; i < count; i++) {
+        delete events[i];
+    }
+
+    cout << "\nПрограмма завершена. Спасибо за использование!\n";
+    return 0;
+}
